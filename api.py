@@ -98,14 +98,17 @@ async def send_admin(callback: types.CallbackQuery):
     await bot.send_message(ADMIN_ID, f"User @{user.username} ({user.id}) wants verification.")
     await bot.answer_callback_query(callback.id, "✅ Request sent to Admin.")
 
-# Webhook (Vercel)
+# Flask Webhook
 @app.route("/api", methods=["POST"])
 def webhook():
-    update = types.Update(**request.json)
-    asyncio.get_event_loop().create_task(dp.process_update(update))
+    try:
+        update = types.Update(**request.json)
+        asyncio.run(dp.process_update(update))
+    except Exception as e:
+        print(f"Error: {e}")
     return "ok"
 
 # Health Check
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
     return "Bot is running"
